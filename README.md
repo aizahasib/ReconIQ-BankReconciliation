@@ -167,7 +167,9 @@ validation, and resumable JSONL logs.
 
 `data/phase0_hard.jsonl` contains 60 synthetic months generated ledger-first,
 with bank lines derived afterward so the gold groups are exact by construction.
-It contains 10,000 bank lines across three sizes:
+It contains 10,000 bank lines, 11,299 ledger entries, 8,846 exact
+gold groups, 500 unmatched bank lines, and 568 unmatched ledger entries
+across three sizes:
 
 | Month size | Months | Bank lines |
 |---:|---:|---:|
