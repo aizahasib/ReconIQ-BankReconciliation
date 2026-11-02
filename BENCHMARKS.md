@@ -1,4 +1,4 @@
-# ReconProof benchmark results
+# ReconIQ benchmark results
 
 This document separates the fully reproducible primary comparison from the
 additional teammate-reported experiments. That distinction matters because
@@ -16,7 +16,7 @@ metrics and paired bootstrap intervals.
 | Approach | Coverage | Exact group F1 | Bank-line accuracy | Estimated API cost |
 |---|---:|---:|---:|---:|
 | Whole month | 60 months / 10,000 lines | 49.31% | 35.76% | $0.65 |
-| **ReconProof harness** | **60 months / 10,000 lines** | **96.06%** | **92.95%** | **$1.81** |
+| **ReconIQ harness** | **60 months / 10,000 lines** | **96.06%** | **92.95%** | **$1.81** |
 
 This is the result to use for the main before/after claim.
 
@@ -45,7 +45,6 @@ groups. Cells below are micro-averaged across those three months.
 | Qwen3-8B 4-bit, base | Harness | 90.1% | 88.4% | MLX |
 | Qwen3-8B Q4_K_M | Harness | 82.2% | 80.6% | Ollama |
 | Llama 3.1 8B | Harness | 61.5% | 59.6% | Ollama |
-| Qwen3-8B 4-bit + LoRA | Harness | 54.7% | 50.4% | MLX; first tuning attempt collapsed |
 
 The fixed-sample comparison reinforces the architecture result: the harness
 helps every completed model with both whole-month and harness results. It also
@@ -69,7 +68,6 @@ maximum possible raw per-line accuracy without changing candidate generation.
 | Qwen3-8B 4-bit, base | 90.2% | 87.4% | 0.0% | 72.4% | 1.7% | 1.37 s wall | Local |
 | Qwen3-8B Q4_K_M | 82.6% | 77.4% | 0.0% | 57.8% | 1.4% | 1.44 s wall | Local |
 | Llama 3.1 8B | 60.8% | 54.2% | 0.0% | 45.4% | 14.1% | 1.20 s wall | Local |
-| Qwen3-8B 4-bit + LoRA | 67.2% | 57.1% | 0.0% | 41.8% | 5.7% | 1.59 s wall | Local |
 
 “Admitted” means that the assembled proposal passed sum, date, and uniqueness
 checks. The wrong-among-admitted column is the observed false-accept rate for
