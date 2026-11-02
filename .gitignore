@@ -1,0 +1,39 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Model artifacts and local runs
+adapters/
+checkpoints/
+*.safetensors
+*.gguf
+*.log
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp

@@ -1,0 +1,75 @@
+{
+  "hard_qwen3_8b": {
+    "model": "qwen3:8b",
+    "regime": "hard",
+    "arity_hint": false,
+    "months": [
+      "m50_00",
+      "m150_00",
+      "m300_00"
+    ],
+    "lines": 500,
+    "raw_accuracy": 0.826,
+    "ambiguous_line_accuracy": 0.7736842105263158,
+    "parse_fail_rate": 0.0,
+    "gold_in_shortlist": 0.974,
+    "admission_rate": 0.578,
+    "far_all_checks": 0.01384083044982699,
+    "far_per_check": {
+      "sum": 0.06082725060827251,
+      "date": 0.18012422360248448,
+      "unique": 0.033003300330033
+    },
+    "sec_per_line": 1.435695167541504,
+    "go": true
+  },
+  "hard_phi4_14b": {
+    "model": "phi4:14b",
+    "regime": "hard",
+    "arity_hint": false,
+    "months": [
+      "m50_00",
+      "m150_00",
+      "m300_00"
+    ],
+    "lines": 500,
+    "raw_accuracy": 0.94,
+    "ambiguous_line_accuracy": 0.9289473684210526,
+    "parse_fail_rate": 0.002,
+    "gold_in_shortlist": 0.974,
+    "admission_rate": 0.816,
+    "far_all_checks": 0.0,
+    "far_per_check": {
+      "sum": 0.013452914798206279,
+      "date": 0.058212058212058215,
+      "unique": 0.02546296296296296
+    },
+    "sec_per_line": 2.1411029682159426,
+    "go": true
+  },
+  "hard_gpt41": {
+    "model": "gpt41",
+    "regime": "hard",
+    "arity_hint": false,
+    "months": [
+      "m50_00",
+      "m150_00",
+      "m300_00"
+    ],
+    "lines": 500,
+    "raw_accuracy": 0.964,
+    "ambiguous_line_accuracy": 0.9552631578947368,
+    "parse_fail_rate": 0.0,
+    "gold_in_shortlist": 0.974,
+    "admission_rate": 0.888,
+    "far_all_checks": 0.0,
+    "far_per_check": {
+      "sum": 0.006578947368421052,
+      "date": 0.008658008658008658,
+      "unique": 0.0022222222222222222
+    },
+    "sec_per_line": 1.0447199635505677,
+    "usd_per_line": 0.0009876600000000009,
+    "go": true
+  }
+}

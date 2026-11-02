@@ -1,0 +1,39 @@
+{
+  "data": {
+    "round_trip_failures": 0,
+    "train_sec": 10604.795787096024
+  },
+  "hard_Qwen3-8B-4bit_base": {
+    "lines": 500,
+    "raw_accuracy": 0.902,
+    "ambiguous_line_accuracy": 0.8736842105263158,
+    "parse_fail_rate": 0.0,
+    "gold_in_shortlist": 0.974,
+    "admission_rate": 0.724,
+    "far_all_checks": 0.016574585635359115,
+    "far_per_check": {
+      "sum": 0.04279279279279279,
+      "date": 0.10144927536231885,
+      "unique": 0.031914893617021274
+    },
+    "sec_per_line": 1.3710586228370667
+  },
+  "hard_Qwen3-8B-4bit_lora2000": {
+    "lines": 500,
+    "raw_accuracy": 0.672,
+    "ambiguous_line_accuracy": 0.5710526315789474,
+    "parse_fail_rate": 0.0,
+    "gold_in_shortlist": 0.974,
+    "admission_rate": 0.418,
+    "far_all_checks": 0.05741626794258373,
+    "far_per_check": {
+      "sum": 0.12639405204460966,
+      "date": 0.33954451345755693,
+      "unique": 0.3147208121827411
+    },
+    "sec_per_line": 1.5917252883911133
+  },
+  "delta_raw_accuracy_pp": -23.0,
+  "delta_far_pp": 4.084168230722462,
+  "go": false
+}

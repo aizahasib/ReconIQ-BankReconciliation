@@ -1,0 +1,3 @@
+# The primary Fireworks evaluation and offline verifier use only Python 3.11's
+# standard library. Optional Apple-silicon LoRA dependencies are isolated in
+# requirements-mlx.txt.

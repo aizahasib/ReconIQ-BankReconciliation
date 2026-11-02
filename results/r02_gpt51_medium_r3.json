@@ -1,0 +1,36 @@
+{
+  "model": "gpt-5.1-2025-11-13",
+  "effort": "medium",
+  "repairs": 3,
+  "regime": "hard",
+  "months_missing": [],
+  "summary": {
+    "300": {
+      "months": 20,
+      "group_precision": 0.9952737298148877,
+      "group_recall": 0.9492862509391435,
+      "group_f1": 0.9717362045760431,
+      "line_accuracy": 0.9125,
+      "unmatched_bank_p": 0.37453183520599254,
+      "unmatched_bank_r": 1.0,
+      "unmatched_ledger_p": 0.501466275659824,
+      "unmatched_ledger_r": 1.0,
+      "usd_per_month": 0.34445468749999997,
+      "sec_per_month": 209.55166079998017
+    },
+    "all": {
+      "months": 20,
+      "group_precision": 0.9952737298148877,
+      "group_recall": 0.9492862509391435,
+      "group_f1": 0.9717362045760431,
+      "line_accuracy": 0.9125,
+      "unmatched_bank_p": 0.37453183520599254,
+      "unmatched_bank_r": 1.0,
+      "unmatched_ledger_p": 0.501466275659824,
+      "unmatched_ledger_r": 1.0,
+      "usd_per_month": 0.34445468749999997,
+      "sec_per_month": 209.55166079998017
+    }
+  },
+  "go": null
+}

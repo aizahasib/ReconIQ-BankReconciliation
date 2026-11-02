@@ -1,0 +1,3 @@
+# Optional: only needed for the Apple-silicon LoRA experiment (`phase0.py r06`).
+mlx==0.32.4
+mlx-lm==0.32.2

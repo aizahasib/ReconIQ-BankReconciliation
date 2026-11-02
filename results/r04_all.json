@@ -1,0 +1,67 @@
+{
+  "hard_phi4_14b": {
+    "model": "phi4:14b",
+    "regime": "hard",
+    "months": 60,
+    "lines": 10000,
+    "raw_accuracy": 0.938,
+    "ambiguous_line_accuracy": 0.9264312466559658,
+    "parse_fail_rate": 0.0004,
+    "gold_in_shortlist": 0.9707,
+    "admission_rate": 0.811,
+    "far_all_checks": 0.0011097410604192356,
+    "far_per_check": {
+      "sum": 0.0105982905982906,
+      "date": 0.06010243545521062,
+      "unique": 0.022494172494172494
+    },
+    "sec_per_line": 2.062922672224045,
+    "usd_per_line": 0.0,
+    "assembled_no_escalation": {
+      "50": {
+        "months": 20,
+        "group_precision": 0.9920814479638009,
+        "group_recall": 0.9920814479638009,
+        "group_f1": 0.9920814479638009,
+        "line_accuracy": 0.993,
+        "unmatched_bank_p": 1.0,
+        "unmatched_bank_r": 1.0,
+        "unmatched_ledger_p": 0.9206349206349206,
+        "unmatched_ledger_r": 1.0
+      },
+      "150": {
+        "months": 20,
+        "group_precision": 0.9713639788997739,
+        "group_recall": 0.9772554965883244,
+        "group_f1": 0.9743008314436885,
+        "line_accuracy": 0.9653333333333334,
+        "unmatched_bank_p": 0.9855072463768116,
+        "unmatched_bank_r": 0.85,
+        "unmatched_ledger_p": 0.8631578947368421,
+        "unmatched_ledger_r": 0.9761904761904762
+      },
+      "300": {
+        "months": 20,
+        "group_precision": 0.8877810007251632,
+        "group_recall": 0.9197971450037565,
+        "group_f1": 0.9035055350553506,
+        "line_accuracy": 0.862,
+        "unmatched_bank_p": 0.8565400843881856,
+        "unmatched_bank_r": 0.6766666666666666,
+        "unmatched_ledger_p": 0.7072649572649573,
+        "unmatched_ledger_r": 0.9678362573099415
+      },
+      "all": {
+        "months": 60,
+        "group_precision": 0.9224652087475149,
+        "group_recall": 0.9441555505313136,
+        "group_f1": 0.9331843575418995,
+        "line_accuracy": 0.9061,
+        "unmatched_bank_p": 0.9132530120481928,
+        "unmatched_bank_r": 0.758,
+        "unmatched_ledger_p": 0.7669902912621359,
+        "unmatched_ledger_r": 0.9735915492957746
+      }
+    }
+  }
+}
