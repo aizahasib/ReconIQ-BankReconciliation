@@ -1,6 +1,6 @@
-# ReconProof harness design
+# ReconIQ harness design
 
-ReconProof splits reconciliation into work that deterministic code can prove
+ReconIQ splits reconciliation into work that deterministic code can prove
 and work that a language model is better at judging. Code searches dates and
 amounts; the model chooses among a small set using vendor, memo, invoice, and
 description text; code then checks the assembled result.
