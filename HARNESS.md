@@ -1,139 +1,152 @@
 # ReconIQ harness design
 
-ReconIQ splits reconciliation into work that deterministic code can prove
-and work that a language model is better at judging. Code searches dates and
-amounts; the model chooses among a small set using vendor, memo, invoice, and
-description text; code then checks the assembled result.
+ReconIQ decomposes reconciliation into a constraint-satisfaction stage, solved deterministically, and a
+disambiguation stage, delegated to a language model. Deterministic code enumerates every ledger subset that
+is consistent with the bank amount and date. The model selects among those candidates using unstructured
+text (counterparty, memo, invoice and description fields). Deterministic code then verifies the assembled
+groups. The model never performs arithmetic and never sees more than one bank line and ten ledger rows.
 
-This page describes the implementation in `recon/shortlist.py` and
-`recon/slm.py`. The Fireworks runner in `fireworks_gpt_oss_harness.py` uses the
-same shortlist and assembly code.
+This document specifies the implementation in `recon/shortlist.py`, `recon/solver.py` and `recon/slm.py`.
+The Fireworks runner (`fireworks_gpt_oss_harness.py`) calls the same shortlist construction, prompt
+rendering, group assembly and check functions.
 
-## Data flow
+## Pipeline
 
-```text
-One bank line + the month's ledger
-                |
-                v
-     Deterministic candidate builder
-   (date window, exact sums, partial targets)
-                |
-                v
-       At most 10 aliased candidates
-         + already-computed options
-                |
-                v
-       One structured model decision
-                |
-                v
-  Assemble identical proposals into groups
-                |
-                v
-       Sum + date + uniqueness checks
-                |
-        +-------+-------+
-        |               |
-      pass             fail
-   auto-accept     unresolved/review
-```
+    bank line b, month ledger L
+            │
+            ▼
+    build_shortlist(m, b)          date-window filter → exact-sum enumeration (k ≤ 4)
+            │                      → partial-payment targets → rank → cap at 10 → alias C1..Cn
+            ▼
+    render_prompt(sl)              ≤10 candidate rows + exact-sum sets + partial targets
+            │
+            ▼
+    model.complete(...)            one constrained decision: {"ledger": ["C3", "C7"]}
+            │
+            ▼
+    parse_answer(sl, text)         alias → ledger id; any id outside the shortlist ⇒ invalid
+            │
+            ▼
+    assemble_groups(proposals)     bank lines with an identical ledger set form one group
+            │
+            ▼
+    run_checks(m, proposals)       sum ∧ date ∧ uniqueness, evaluated per group
+            │
+     ┌──────┴───────┐
+     pass           fail
+     auto-accept    unresolved → review queue
 
-## 1. Deterministic candidate generation
+## 1. Candidate generation (`build_shortlist`)
 
-For each bank line, `build_shortlist` performs the following operations:
+All amounts are integer cents, so every equality below is exact.
 
-1. **Date filtering.** The normal code window is `DATE_WINDOW = (-2, 7)`,
-   measured as `bank_date - ledger_date`. This permits a ledger date up to two
-   days after the bank date or up to seven days before it. Partial-payment
-   discovery uses the wider `PARTIAL_WINDOW = (-2, 20)`.
-2. **Exact-sum search.** Amounts are stored as integer cents. The filter finds
-   one- through four-entry ledger subsets whose total exactly equals the bank
-   amount. This also represents a processor payout as gross sales plus a
-   negative fee entry.
-3. **Partial-payment targets.** For a larger same-sign ledger entry, the filter
-   looks for one or two sibling bank lines that, together with the current
-   line, exactly equal the ledger amount.
-4. **Ranking and cap.** Exact-sum sets are ranked by fewer entries, tighter date
-   spread, and stable ID order. Candidate IDs from those sets and partial
-   targets are collected and capped at ten.
-5. **Aliasing.** The prompt exposes candidates only as `C1` through `C10`.
-   Real ledger IDs are mapped back only after a valid answer is received.
+**Date filter.** A ledger entry l is eligible for bank line b if
+`DATE_WINDOW[0] ≤ day(b) − day(l) ≤ DATE_WINDOW[1]`, with `DATE_WINDOW = (−2, 7)` (`recon/gen.py`). A
+ledger entry may be dated up to 2 days after the bank line or up to 7 days before it. Partial-payment
+discovery uses `PARTIAL_WINDOW = (−2, 20)` (`recon/solver.py`).
 
-The internal exact-sum search keeps at most 60 sets before the final ten-entry
-candidate cap. A candidate can be present even when it belongs to more than one
-arithmetically valid option; this is the ambiguity the model must resolve.
+**Exact-sum enumeration.** `subset_sums(b.amount, pool, max_k=4, cap=60)` returns every subset of size 1–4
+of the date-filtered pool whose sum equals the bank amount.
+- Sizes 1 and 2 are enumerated completely, through an amount-indexed hash map.
+- Size 3 is a nested scan over the hash map.
+- Size 4 is a meet-in-the-middle join over pair sums, with index ordering i<j<k<l so each set appears once.
+- Sizes 3 and 4 stop once 60 sets have been found, so enumeration is complete for k ≤ 2 and bounded for
+  k ≥ 3.
 
-## 2. Bounded model decision
+Fee-netted payouts need no special case: the gross-sale entry and the negative fee entry form a size-2 set.
 
-The model sees:
+**Partial-payment targets.** A ledger entry l becomes a target for b when three conditions hold:
+- it has the same sign as b and |l| > |b|;
+- it lies within `PARTIAL_WINDOW` of b;
+- one or two other same-sign bank lines, also within the window, satisfy
+  `b + Σ siblings = l` (from `subset_sums(l − b, others, max_k=2, cap=5)`).
 
-- one bank line;
-- up to ten ledger rows with date, amount, vendor/customer, account, and memo;
-- the candidate sets that already sum exactly to the bank amount; and
-- any ledger entries identified as possible partial-payment targets.
+The first sibling set found is recorded. This enumerates many-to-one groups without any single call seeing
+the whole month.
 
-It returns one structured answer:
+**Ranking and cap.** Exact-sum sets are sorted by (cardinality, maximum date distance from b, lexicographic
+ids). Candidate ids are collected in that order, and partial targets are appended after all exact-sum ids.
+The list is then truncated to 10 (`MAX_CANDIDATES`). Two consequences:
+- Sets that are not fully contained in the kept candidates are dropped.
+- Partial-payment targets have the lowest priority, so on months dense with exact-sum sets they are the
+  first candidates the cap removes.
 
-```json
-{"ledger": ["C3", "C7"]}
-```
+**Aliasing and order.** Kept candidates are re-sorted by (date, id) and exposed only as `C1..Cn`. The model
+therefore sees no real ledger ids, and the display order carries no signal from the ranking. `parse_answer`
+maps aliases back to ledger ids and returns `None` for malformed output or any alias outside `C1..Cn`.
 
-An empty list means no match. Any malformed response or candidate outside the
-shortlist is invalid. The Fireworks runner requests JSON-schema output and can
-make up to two validation-repair calls. It saves one JSONL row per bank line,
-so a stopped run resumes without repeating completed decisions.
+## 2. Model decision
 
-The primary run used GPT-OSS-120B with medium reasoning and eight
-concurrent workers. Concurrency changes throughput, not the candidate sets or
-scoring. A separate 500-line ablation used low reasoning; its results are
-reported in `BENCHMARKS.md` and must not be mixed with the primary run.
+**Input:**
+- the bank line (date, amount, description);
+- up to 10 candidate rows (date, amount, counterparty, account, memo);
+- the exact-sum sets, already restricted to the kept candidates;
+- the partial-payment targets.
 
-## 3. Group assembly and checks
+Every option the model is offered has already been verified arithmetically. Its task is a single-label
+selection over at most `|sets| + |partials| + 1` alternatives, the last being "none" (`{"ledger": []}`).
 
-`assemble_groups` merges bank lines that selected the same ledger set. This is
-how several partial payments can form one many-bank-to-one group even though no
-model call sees the whole month.
+**Output contract:** `{"ledger": ["C…", …]}`. The Fireworks runner requests JSON-schema-constrained
+output and makes up to two validation-repair calls on an invalid response.
 
-`run_checks` evaluates each non-empty assembled cluster:
+**Logging:** each bank line writes one JSONL row containing the proposal, the raw output, the gold answer,
+shortlist statistics and token usage. Runs are idempotent and resumable at line granularity.
 
-- **Sum:** the total of all bank lines in the cluster equals the total of its
-  ledger entries exactly, to the cent.
-- **Date:** every bank/ledger relationship falls within the applicable normal
-  or partial-payment window.
-- **Uniqueness:** no ledger entry is claimed by two different proposed groups.
+**Run configuration.** The primary run used GPT-OSS-120B at `reasoning_effort=medium` with 8 concurrent
+workers. Concurrency affects throughput only: shortlists, prompts and scoring are deterministic functions
+of the month. The 500-line ablation in `BENCHMARKS.md` used `reasoning_effort=low` and is reported
+separately.
 
-The raw benchmark scores all assembled proposals with no escalation. The
-safety-oriented operating tier auto-accepts only groups whose constituent
-proposals pass all three checks; failures should be labeled **unresolved** and
-sent to review, not silently declared unmatched.
+## 3. Assembly and verification
 
-## What the checks do and do not prove
+**Assembly.** `assemble_groups` clusters bank lines by their exact proposed ledger set. A cluster
+`({b₁…bₙ}, S)` becomes one predicted group, which is how a many-to-one group emerges from independent
+per-line decisions.
 
-The checks establish arithmetic and structural consistency. They do not prove
-that the text-based choice is the only valid business interpretation. An
-equal-amount decoy can still satisfy sum and date checks. That is why false
-accept rate is measured empirically and why production deployment still needs
-human review, access controls, and testing on real data.
+**Checks.** `run_checks` evaluates each non-empty cluster:
 
-On the primary 10,000-line run, the checked tier accepted 8,121 groups with
-only four false groups: **99.95% group precision and 91.76% recall**. On the
-separate 500-line low-reasoning run, 83.0% of line proposals were admitted with
-no wrong admitted proposals in that sample.
+| Check | Condition |
+|---|---|
+| Sum | Σ bank amounts in the cluster = Σ ledger amounts in S, exactly |
+| Date | every (bᵢ, l ∈ S) pair lies in `PARTIAL_WINDOW` when n > 1, otherwise in `DATE_WINDOW` |
+| Uniqueness | no l ∈ S is claimed by any other cluster |
 
-## Known limitation
+A line is **admitted** when its cluster passes all three checks. False-accept rate (FAR) is the fraction
+of admitted lines whose proposal differs from gold.
 
-Shortlist coverage is the upper bound on per-line model accuracy. It was 97.1%
-on the full Phi-4 run and 97.4% on the fixed 500-line comparison, but it declines
-at the largest month size. Many-bank-to-one partial-payment groups are the
-primary remaining weakness because every sibling bank line must independently
-select the same ledger target before assembly succeeds.
+**Scoring modes.**
+- The raw benchmark scores every assembled proposal, with no escalation.
+- The operating tier auto-accepts only admitted groups. Rejected groups are labelled unresolved and
+  routed to review, never silently treated as unmatched.
+
+## Soundness of the checks
+
+The checks are **necessary, not sufficient**. They guarantee arithmetic consistency, date feasibility and
+one-to-one use of each ledger entry. They cannot prove that the textual choice is right: an equal-amount
+decoy within the date window passes all three. FAR is therefore measured empirically, not guaranteed.
+
+| Run | Admitted | Errors among admitted | Precision / recall |
+|---|---|---|---|
+| Primary run, 10,000 lines, medium reasoning | 8,121 groups | 4 false groups | 99.95% / 91.76% |
+| 500-line ablation, low reasoning | 83.0% of lines | none observed | — |
+
+## Limitations
+
+- **Coverage ceiling.** Per-line accuracy is bounded by shortlist recall: the fraction of lines whose
+  gold set lies inside the kept candidates. That is 97.1% over all 10,000 lines (Phi-4 run) and 97.4% on
+  the 500-line set. It falls to 95.2% on 300-line months, where 62% of shortlists hit the 10-candidate cap.
+- **Many-to-one groups.** A group of n partial payments is recovered only if all n sibling bank lines
+  independently select the same target. Per-line accuracy p therefore compounds to roughly pⁿ for the
+  group. Because partial targets are ranked last, the cap also removes them first. This is the dominant
+  remaining error class.
 
 ## Code map
 
 | Component | Location |
 |---|---|
-| Candidate generation and prompt rendering | `recon/shortlist.py` |
-| Exact-sum search and date-window helpers | `recon/solver.py` |
-| Local backends and shared line evaluation | `recon/slm.py` |
+| Shortlist construction, prompt rendering, answer parsing, assembly, checks | `recon/shortlist.py` |
+| Exact-sum enumeration (`subset_sums`), date windows (`in_window`, `PARTIAL_WINDOW`) | `recon/solver.py` |
+| `DATE_WINDOW`, synthetic month generator | `recon/gen.py` |
+| Per-line runner, local backends, line-level evaluation | `recon/slm.py` |
 | Fireworks GPT-OSS runner | `fireworks_gpt_oss_harness.py` |
 | Exact group and unmatched-item scoring | `recon/score.py` |
-
