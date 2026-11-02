@@ -1,4 +1,4 @@
-# ReconProof
+# ReconIQ - Bank Reconciliation
 
 **Verified bank reconciliation with Fireworks GPT-OSS**
 
