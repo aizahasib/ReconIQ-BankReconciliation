@@ -1,4 +1,4 @@
-# ReconProof — submission kit
+# ReconIQ — submission kit
 
 This file is formatted for copying into the HackerSquad project form. Replace
 the bracketed placeholders and confirm the disclosure section before
@@ -6,7 +6,7 @@ submitting.
 
 ## Project name
 
-ReconProof
+ReconIQ - Bank Reconciliation
 
 ## One-line description
 
@@ -23,7 +23,7 @@ netting, date lag, equal-amount decoys, and unmatched items.
 **Intended user:** Finance and accounting teams that need to reconcile large
 transaction batches without blindly trusting plausible LLM output.
 
-**Approach:** ReconProof generates an arithmetic shortlist for each bank line,
+**Approach:** ReconIQ generates an arithmetic shortlist for each bank line,
 asks GPT-OSS-120B on Fireworks Serverless to select the correct candidates, and
 checks every proposal for amount, date, and uniqueness consistency. Checked
 matches can be accepted automatically; failures remain unresolved for review.
@@ -43,7 +43,7 @@ batches. Their expensive work is not just finding obvious one-to-one matches;
 it is investigating exceptions, partial payments, processor fees, duplicate
 amounts, and plausible but incorrect proposals.
 
-ReconProof's checked tier admits 84.33% of line proposals on the benchmark. An
+ReconIQ's checked tier admits 84.33% of line proposals on the benchmark. An
 illustrative 10,000-line workload would therefore reduce the review queue from
 10,000 lines to 1,567. Assuming 30 seconds of analyst review per line, that is
 83.3 hours versus 13.1 hours, or 70.3 hours shifted from routine inspection to
