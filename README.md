@@ -2,7 +2,7 @@
 
 **Verified bank reconciliation with Fireworks GPT-OSS**
 
-ReconProof combines deterministic accounting constraints with an LLM. Instead
+ReconIQ combines deterministic accounting constraints with an LLM. Instead
 of asking a model to reconcile an entire month in one response, it generates a
 small arithmetic shortlist for each bank line, asks GPT-OSS to choose among the
 candidates, and verifies the proposal with sum, date, and uniqueness checks.
@@ -13,7 +13,7 @@ months:
 | Approach | Exact group F1 | Bank-line accuracy | Estimated API cost |
 |---|---:|---:|---:|
 | GPT-OSS-120B, whole month | 49.31% | 35.76% | $0.65 |
-| **GPT-OSS-120B + ReconProof harness** | **96.06%** | **92.95%** | $1.81 |
+| **GPT-OSS-120B + ReconIQ harness** | **96.06%** | **92.95%** | $1.81 |
 
 At 300 bank lines—the hardest setting—the harness raises group F1 from 21.17%
 to 94.21%. If only proposals passing all three checks are automatically
@@ -26,7 +26,7 @@ several invoices, several partial payments can settle one ledger entry, and
 processor fees can net against gross sales. A plausible but arithmetically
 wrong match creates downstream accounting risk.
 
-ReconProof separates the work:
+ReconIQ separates the work:
 
 ```text
 Bank line + ledger
@@ -60,7 +60,7 @@ admit 84.33% of line proposals at a 0.047% observed false-accept rate.
 
 For an illustrative 10,000-line monthly workload:
 
-| Assumption | Manual workflow | ReconProof review tier |
+| Assumption | Manual workflow | ReconIQ review tier |
 |---|---:|---:|
 | Lines requiring review | 10,000 | 1,567 |
 | Review time at 30 seconds per line | 83.3 hours | 13.1 hours |
@@ -106,11 +106,18 @@ primary headline above.
 | Model | Approach | Reasoning | Exact group F1 | Bank-line accuracy |
 |---|---|---|---:|---:|
 | GPT-OSS-120B | Whole month | Low | 53.6% | 45.0% |
-| **GPT-OSS-120B** | **ReconProof harness** | **Low** | **96.4%** | **92.2%** |
-| GPT-4.1 | ReconProof harness | — | 97.9% | 95.4% |
-| Phi-4 14B | ReconProof harness | — | 93.7% | 91.6% |
-| Qwen3-8B 4-bit | ReconProof harness | — | 90.1% | 88.4% |
-| Llama 3.1 8B | ReconProof harness | — | 61.5% | 59.6% |
+| **GPT-OSS-120B** | **ReconIQ harness** | **Low** | **96.4%** | **92.2%** |
+| GPT-4.1 | ReconIQ harness | — | 97.9% | 95.4% |
+| Phi-4 14B | ReconIQ harness | — | 93.7% | 91.6% |
+| Qwen3-8B 4-bit | ReconIQ harness | — | 90.1% | 88.4% |
+| Nemotron 3.5 Lightning 30B-A3B | Whole month | Off | 18.8% | 18.6% |
+| Nemotron 3.5 Lightning 30B-A3B | ReconIQ harness | Mixed† | 88.3% | 83.4% |
+| Llama 3.1 8B | ReconIQ harness | — | 61.5% | 59.6% |
+
+† 184 of 500 lines were answered with reasoning on and the other 316 with
+`reasoning_effort=none`. Nemotron's first harness run spent its whole token
+budget on reasoning for 316 lines, which were then re-asked with reasoning off.
+11 lines never got a usable answer (8 endpoint timeouts, 3 malformed JSON).
 
 The low-reasoning GPT-OSS harness achieved 94.2% raw per-line selection
 accuracy, admitted 83.0% of proposals with no observed false accepts in this
