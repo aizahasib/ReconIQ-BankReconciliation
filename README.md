@@ -97,7 +97,7 @@ level gives **p = 8.05e-16** for the 56-to-1 win/loss split, excluding three
 ties. Both tests keep each reconciliation month as the unit of evidence rather
 than treating correlated lines as independent.
 
-## Additional teammate runs
+## Additional runs
 
 A separate fixed sample of the first 50-, 150-, and 300-line months provides a
 500-line cross-model comparison. These are supporting experiments, not the
@@ -142,7 +142,7 @@ python3 fireworks_gpt_oss.py --limit 1
 python3 fireworks_gpt_oss.py
 ```
 
-### ReconProof harness
+### ReconIQ harness
 
 Start with 25 lines, then resume across all 10,000:
 
