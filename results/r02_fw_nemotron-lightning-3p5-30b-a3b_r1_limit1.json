@@ -1,0 +1,62 @@
+{
+  "model": "accounts/fireworks/models/nemotron-lightning-3p5-30b-a3b",
+  "effort": "none",
+  "repairs": 1,
+  "regime": "hard",
+  "months_missing": [],
+  "summary": {
+    "50": {
+      "months": 1,
+      "group_precision": 0.5,
+      "group_recall": 0.4883720930232558,
+      "group_f1": 0.4941176470588235,
+      "line_accuracy": 0.42,
+      "unmatched_bank_p": 0.0,
+      "unmatched_bank_r": 0.0,
+      "unmatched_ledger_p": 0.2,
+      "unmatched_ledger_r": 0.5,
+      "usd_per_month": 0.0088996,
+      "sec_per_month": 240.54064011573792
+    },
+    "150": {
+      "months": 1,
+      "group_precision": 0.25142857142857145,
+      "group_recall": 0.3384615384615385,
+      "group_f1": 0.28852459016393445,
+      "line_accuracy": 0.3,
+      "unmatched_bank_p": 1.0,
+      "unmatched_bank_r": 0.125,
+      "unmatched_ledger_p": 0.022222222222222223,
+      "unmatched_ledger_r": 0.1111111111111111,
+      "usd_per_month": 0.00336255,
+      "sec_per_month": 315.4426350593567
+    },
+    "300": {
+      "months": 1,
+      "group_precision": 0.0847457627118644,
+      "group_recall": 0.09191176470588236,
+      "group_f1": 0.08818342151675485,
+      "line_accuracy": 0.09,
+      "unmatched_bank_p": 0.5,
+      "unmatched_bank_r": 0.13333333333333333,
+      "unmatched_ledger_p": 0.05782312925170068,
+      "unmatched_ledger_r": 0.9444444444444444,
+      "usd_per_month": 0.006582800000000001,
+      "sec_per_month": 1209.0227389335632
+    },
+    "all": {
+      "months": 3,
+      "group_precision": 0.17578125,
+      "group_recall": 0.20224719101123595,
+      "group_f1": 0.18808777429467083,
+      "line_accuracy": 0.186,
+      "unmatched_bank_p": 0.42857142857142855,
+      "unmatched_bank_r": 0.12,
+      "unmatched_ledger_p": 0.055232558139534885,
+      "unmatched_ledger_r": 0.6551724137931034,
+      "usd_per_month": 0.006281650000000001,
+      "sec_per_month": 588.3353380362192
+    }
+  },
+  "go": true
+}

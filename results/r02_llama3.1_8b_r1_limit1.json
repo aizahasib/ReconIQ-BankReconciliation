@@ -1,0 +1,62 @@
+{
+  "model": "llama3.1:8b",
+  "effort": null,
+  "repairs": 1,
+  "regime": "hard",
+  "months_missing": [],
+  "summary": {
+    "50": {
+      "months": 1,
+      "group_precision": 0.2916666666666667,
+      "group_recall": 0.16279069767441862,
+      "group_f1": 0.20895522388059704,
+      "line_accuracy": 0.18,
+      "unmatched_bank_p": 0.10526315789473684,
+      "unmatched_bank_r": 1.0,
+      "unmatched_ledger_p": 0.047619047619047616,
+      "unmatched_ledger_r": 0.5,
+      "usd_per_month": 0.0,
+      "sec_per_month": 52.84069514274597
+    },
+    "150": {
+      "months": 1,
+      "group_precision": 0.1111111111111111,
+      "group_recall": 0.06923076923076923,
+      "group_f1": 0.08530805687203792,
+      "line_accuracy": 0.08,
+      "unmatched_bank_p": 0.043478260869565216,
+      "unmatched_bank_r": 0.375,
+      "unmatched_ledger_p": 0.05521472392638037,
+      "unmatched_ledger_r": 1.0,
+      "usd_per_month": 0.0,
+      "sec_per_month": 255.97825026512146
+    },
+    "300": {
+      "months": 1,
+      "group_precision": 0.0,
+      "group_recall": 0.0,
+      "group_f1": 0.0,
+      "line_accuracy": 0.01,
+      "unmatched_bank_p": 0.5,
+      "unmatched_bank_r": 0.2,
+      "unmatched_ledger_p": 0.05142857142857143,
+      "unmatched_ledger_r": 1.0,
+      "usd_per_month": 0.0,
+      "sec_per_month": 492.0590500831604
+    },
+    "all": {
+      "months": 3,
+      "group_precision": 0.0642570281124498,
+      "group_recall": 0.035955056179775284,
+      "group_f1": 0.04610951008645533,
+      "line_accuracy": 0.048,
+      "unmatched_bank_p": 0.0851063829787234,
+      "unmatched_bank_r": 0.32,
+      "unmatched_ledger_p": 0.052434456928838954,
+      "unmatched_ledger_r": 0.9655172413793104,
+      "usd_per_month": 0.0,
+      "sec_per_month": 266.9593318303426
+    }
+  },
+  "go": true
+}
