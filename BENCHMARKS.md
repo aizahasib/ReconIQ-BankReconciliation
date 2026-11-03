@@ -24,6 +24,37 @@ accuracy on 56 months, ties on three, and loses on one; an exact two-sided sign
 test gives p = 8.05e-16 with ties excluded. Both analyses preserve the month as
 the evidence unit so correlated lines are not treated as independent.
 
+### Local model: full 60-month Phi-4 run
+
+The same harness runs Phi-4 14B on a laptop through Ollama, with no API calls: same 60 months, same
+10,000 bank lines. Phi-4 has no whole-month row because a 300-line month (about 21k tokens) is larger
+than its 16k context. The two baselines below are the strongest whole-month and no-model results on the
+same months. The raw per-line log is in `results/lines/r04all_hard_phi4_14b.jsonl`, and
+`python3 phase0.py r04 --model phi4:14b --all-months` re-scores it without calling the model.
+
+| Approach | Coverage | Exact group F1 | Bank-line accuracy | Estimated API cost |
+|---|---:|---:|---:|---:|
+| Amount-and-date solver (no model) | 60 months / 10,000 lines | 68.52% | 71.78% | $0 |
+| GPT-4.1, whole month | 60 months / 10,000 lines | 75.30% | 69.02% | — |
+| **Phi-4 14B + ReconIQ harness** | **60 months / 10,000 lines** | **93.32%** | **90.61%** | **$0 (local)** |
+
+By month size, the harness's group F1 is 99.21% at 50 lines, 97.43% at 150 and 90.35% at 300. Per-line
+selection accuracy is 93.8%, against a shortlist ceiling of 97.07%. Calls ran one at a time at 2.1 s
+per line.
+
+**Auto-accept tier:** the checks admitted 81.1% of line proposals, with an observed false-accept rate of
+0.11%. Accepting only groups that pass all three checks gives 7,786 groups, of which 8 are wrong: 99.90%
+group precision at 87.93% recall.
+
+**Statistics:** paired month bootstraps (10,000 resamples) put the group-F1 improvement at +23.52 to
++26.23 percentage points over the solver, and +16.72 to +19.13 over whole-month GPT-4.1, at 95%
+confidence. The harness wins month-level line accuracy on all 60 months against both baselines, with no
+ties or losses (exact two-sided sign test, p = 1.73e-18). As in the primary analysis, the month is the
+unit of evidence.
+
+Compared with GPT-OSS-120B in the harness (96.06%), the free local 14B model scores 2.7 points lower. Most
+of the gap is at 300 lines, where 4.8% of lines have no gold answer on the shortlist.
+
 ### Supporting comparison: fixed 500-line set
 
 The teammate report evaluates the first month of each size: `m50_00`,
