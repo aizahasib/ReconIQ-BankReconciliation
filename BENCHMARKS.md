@@ -1,8 +1,6 @@
 # ReconIQ benchmark results
 
-This document separates the fully reproducible primary comparison from the
-additional teammate-reported experiments. That distinction matters because
-the runs use different reasoning settings, sample sizes, and coverage.
+This document covers the comprehensive benchmarks across a range of models.
 
 ## Evidence tiers
 
